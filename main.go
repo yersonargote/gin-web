@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -63,9 +64,9 @@ func UpdateRecipeHandler(ctx *gin.Context) {
 func FindRecipeHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	for _, value := range recipes {
-		if value.ID == id {
-			ctx.JSON(http.StatusOK, value)
+	for _, recipe := range recipes {
+		if recipe.ID == id {
+			ctx.JSON(http.StatusOK, recipe)
 			return
 		}
 	}
@@ -78,10 +79,10 @@ func FindRecipeHandler(ctx *gin.Context) {
 func DeleteRecipeHandler(ctx *gin.Context) {
 	id := ctx.Param("id")
 
-	for idx, value := range recipes {
-		if value.ID == id {
+	for idx, recipe := range recipes {
+		if recipe.ID == id {
 			recipes = append(recipes[:idx], recipes[idx+1:]...)
-			ctx.JSON(http.StatusOK, value)
+			ctx.JSON(http.StatusOK, recipe)
 			return
 		}
 	}
@@ -91,11 +92,27 @@ func DeleteRecipeHandler(ctx *gin.Context) {
 	})
 }
 
+func SearchRecipeHandler(ctx *gin.Context) {
+	tag := ctx.Query("tag")
+	queryRecipes := make([]Recipe, 0)
+
+	for _, recipe := range recipes {
+		for _, value := range recipe.Tags {
+			if strings.EqualFold(value, tag) {
+				queryRecipes = append(queryRecipes, recipe)
+				break
+			}
+		}
+	}
+	ctx.JSON(http.StatusOK, queryRecipes)
+}
+
 func main() {
 	router := gin.Default()
 	router.POST("/recipes", NewRecipeHandler)
 	router.GET("/recipes", ListRecipesHandler)
 	router.GET("/recipes/:id", FindRecipeHandler)
+	router.GET("/recipes/search", SearchRecipeHandler)
 	router.PUT("/recipes/:id", UpdateRecipeHandler)
 	router.DELETE("/recipes/:id", DeleteRecipeHandler)
 	router.Run()
