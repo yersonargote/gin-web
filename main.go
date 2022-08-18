@@ -1,10 +1,18 @@
 package main
 
 import (
-	"encoding/xml"
+	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/rs/xid"
 )
+
+var recipes []Recipe
+
+func init() {
+	recipes = make([]Recipe, 0)
+}
 
 func IndexHandler(ctx *gin.Context) {
 	ctx.JSON(200, gin.H{
@@ -12,43 +20,32 @@ func IndexHandler(ctx *gin.Context) {
 	})
 }
 
-func Greeting(ctx *gin.Context) {
-	name := ctx.Params.ByName("name")
-	ctx.JSON(200, gin.H{
-		"message": "hello " + name,
-	})
-}
-
-func InfoPerson(ctx *gin.Context) {
-	ctx.XML(200, Person{
-		FirstName: "Yerson",
-		LastName:  "Argote",
-	})
-}
-
-func InfoBreakfast(ctx *gin.Context) {
-	ctx.JSON(200, Breakfast{
-		Drink: "Coffe",
-		Fruit: "Banana",
-	})
+func NewRecipeHandler(ctx *gin.Context) {
+	var recipe Recipe
+	if err := ctx.ShouldBindJSON(&recipe); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	recipe.ID = xid.New().String()
+	recipe.PublishedAt = time.Now()
+	recipes = append(recipes, recipe)
+	ctx.JSON(http.StatusOK, recipe)
 }
 
 func main() {
 	router := gin.Default()
 	router.GET("/", IndexHandler)
-	router.GET("/:name", Greeting)
-	router.GET("/person", InfoPerson)
-	router.GET("/breakfast", InfoBreakfast)
+	router.POST("/recipes", NewRecipeHandler)
 	router.Run()
 }
 
-type Person struct {
-	XMLName   xml.Name `xml:"person"`
-	FirstName string   `xml:"firstName,attr"`
-	LastName  string   `xml:"lastName,attr"`
-}
-
-type Breakfast struct {
-	Drink string `json:"drink"`
-	Fruit string `json:"fruit"`
+type Recipe struct {
+	ID           string    `json:"id"`
+	Name         string    `json:"name"`
+	Tags         []string  `json:"tags"`
+	Ingredients  []string  `json:"ingredients"`
+	Instructions []string  `json:"instructions"`
+	PublishedAt  time.Time `json:"publishedAt"`
 }
