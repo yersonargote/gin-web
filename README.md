@@ -15,15 +15,33 @@ the project from GitHub.
 
 ## Note Swagger GO
 
-### Docker image
+1. Generate swagger.json / OpenAPI V2
 
 ```bash
-docker pull quay.io/goswagger/swagger
+go-swagger generate spec -o ./swagger.json
 ```
 
-### For Mac and Linux users
+2. Convert swagger.json to openapi.json / OpenAPI V2 to V3
+
+(converter swagger)(https://converter.swagger.io/)
+
+***Note***: Change the swagger.json filename to openapi.json
+
+3. Docker openapi image
 
 ```bash
-alias swagger='docker run --rm -it  --user $(id -u):$(id -g) -e GOPATH=$(go env GOPATH):/go -v $HOME:$HOME -w $(pwd) quay.io/goswagger/swagger'
-swagger version
+docker pull swaggerapi/swagger-ui
 ```
+
+```bash
+docker run --rm -p 80:8080 -e SWAGGER_JSON=/app/openapi.json -v @path/to/golang/app:/app swaggerapi/swagger-ui
+```
+
+### Test
+
+```go
+go run main.go
+```
+
+***Swagger UI***
+[URL](localhost:80)
