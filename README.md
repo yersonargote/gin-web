@@ -23,9 +23,18 @@ go-swagger generate spec -o ./swagger.json
 
 2. Convert swagger.json to openapi.json / OpenAPI V2 to V3
 
-(converter swagger)(https://converter.swagger.io/)
+### Manual
+
+[converter swagger](https://converter.swagger.io/)
 
 ***Note***: Change the swagger.json filename to openapi.json
+
+### Auto
+
+```bash
+curl -X POST "https://converter.swagger.io/api/convert" -H "accept: application/json" -H "Content-Type: application/json" -d "@./swagger.json" > openapi.json
+```
+
 
 3. Docker openapi image
 
@@ -44,4 +53,5 @@ go run main.go
 ```
 
 ***Swagger UI***
-[URL](localhost:80)
+
+[URL Localhost](localhost:80)
