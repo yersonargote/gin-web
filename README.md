@@ -2,18 +2,23 @@
 
 Following the book for learn to create apps in GO.
 
-## Note
+### Note
+
 If you're running Go 1.16 and above, you need to disable Go modules via the
+
 ```bash
 GO111MODULE=off option
 ```
 
-## Note
+### Note
+
 If you're working with a team of developers, you will need to issue the `go
 mod download` command to install the required dependencies after cloning
 the project from GitHub.
 
-## Note Swagger GO
+## Go Swagger
+
+Install [go-swagger](https://github.com/go-swagger/go-swagger)
 
 1. Generate swagger.json / OpenAPI V2
 
@@ -25,16 +30,15 @@ go-swagger generate spec -o ./swagger.json
 
 ### Manual
 
-[converter swagger](https://converter.swagger.io/)
+Go to [swagger-convert](https://converter.swagger.io/) and convert the swagger.json to openapi.json.
 
-***Note***: Change the swagger.json filename to openapi.json
+Download the ***response***.
 
 ### Auto
 
 ```bash
 curl -X POST "https://converter.swagger.io/api/convert" -H "accept: application/json" -H "Content-Type: application/json" -d "@./swagger.json" > openapi.json
 ```
-
 
 3. Docker openapi image
 
@@ -46,12 +50,12 @@ docker pull swaggerapi/swagger-ui
 docker run --rm -p 80:8080 -e SWAGGER_JSON=/app/openapi.json -v @path/to/golang/app:/app swaggerapi/swagger-ui
 ```
 
-### Test
+### Test swagger-ui
 
 ```go
 go run main.go
 ```
 
-***Swagger UI***
+### Swagger UI
 
-[URL Localhost](localhost:80)
+[URL Localhost](http:localhost:80)
